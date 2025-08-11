@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>スマホ用ワンクリック予想</title>
+  <meta name="theme-color" content="#0b1437" />
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/icons/icon-192.png">
+  <style>
+    :root{--bg:#f7f8fb;--card:#ffffff;--text:#0f172a;--muted:#64748b;--brand:#3b82f6;--chip:#e8f0ff;}
+    *{box-sizing:border-box;}
+    html,body{padding:0;margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,Apple Color Emoji,Segoe UI Emoji;}
+    .wrap{max-width:960px;margin:0 auto;padding:16px;}
+    header{display:flex;align-items:center;gap:8px;margin:8px 0 12px;}
+    header .logo{width:28px;height:28px;border-radius:8px;background:var(--brand);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;}
+    .card{background:var(--card);border:1px solid #e5e7eb;border-radius:16px;box-shadow:0 1px 2px rgba(0,0,0,.04);padding:16px;margin-bottom:12px;}
+    .grid{display:grid;grid-template-columns:1fr;gap:12px;}
+    @media(min-width:768px){.grid-3{grid-template-columns:repeat(3,1fr);} .grid-2{grid-template-columns:repeat(2,1fr);}}
+    label{font-size:14px;color:var(--muted);display:block;margin-bottom:6px;}
+    input,select,button{width:100%;padding:12px;border:1px solid #e5e7eb;border-radius:12px;font-size:16px;background:#fff;}
+    button.primary{background:var(--brand);color:#fff;border-color:transparent;font-weight:600;}
+    button.outline{background:#fff;color:#0f172a;}
+    button:disabled{opacity:.6;}
+    .row{display:flex;gap:12px;align-items:center;}
+    .switch{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border:1px solid #e5e7eb;border-radius:12px;background:#f8fafc;}
+    .hint{font-size:12px;color:var(--muted);}
+    .result-item{display:flex;align-items:center;justify-content:space-between;border:1px solid #e5e7eb;border-radius:16px;padding:12px;}
+    .rank{width:42px;height:42px;border-radius:9999px;background:#2563eb;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;}
+    .rank.r2{background:#3b82f6}.rank.r3{background:#60a5fa}
+    .badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+    .badge{font-size:12px;background:var(--chip);border:1px solid #bfd7ff;border-radius:999px;padding:2px 8px;}
+    .score{font-weight:800;font-size:20px;text-align:right}
+    .footer{font-size:12px;color:var(--muted);text-align:center;margin:16px 0 24px;}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">K</div>
+      <h1 style="font-size:18px;margin:0;">スマホ用ワンクリック予想（日本語PWA）</h1>
+    </header>
+
+    <section class="card" aria-labelledby="inputs">
+      <h2 id="inputs" class="hint" style="margin:0 0 8px 0">レース指定</h2>
+      <div class="grid grid-3">
+        <div>
+          <label>日付（YYYYMMDD）</label>
+          <input id="date" inputmode="numeric" placeholder="20250914" aria-label="日付">
+        </div>
+        <div class="grid-2">
+          <div style="grid-column:1 / -1;">
+            <label>レース名</label>
+            <input id="race" placeholder="例：東京新聞杯" aria-label="レース名">
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-3" style="margin-top:12px">
+        <div>
+          <label>対象範囲</label>
+          <select id="scope" aria-label="対象範囲">
+            <option>重賞のみ</option>
+            <option>中央全レース</option>
+            <option>指定レースのみ</option>
+          </select>
+        </div>
+        <div class="switch" role="group" aria-label="追い切りサイト うましる">
+          <div>
+            <div style="font-size:14px;font-weight:600">うましる</div>
+            <div class="hint">追い切りベンチマーク</div>
+          </div>
+          <input id="uma" type="checkbox" checked aria-label="うましるを使用">
+        </div>
+        <div class="switch" role="group" aria-label="追い切りサイト アギョウ">
+          <div>
+            <div style="font-size:14px;font-weight:600">アギョウ</div>
+            <div class="hint">追い切りベンチマーク</div>
+          </div>
+          <input id="agyo" type="checkbox" checked aria-label="アギョウを使用">
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px">
+        <button id="btn" class="primary" aria-label="取得と採点を実行">取得＆採点</button>
+        <button id="btnCfg" class="outline" disabled aria-disabled="true">重み・しきい値（管理）</button>
+      </div>
+      <div class="hint" style="margin-top:6px">現在はデモ表示です。API接続後は実データに切り替わります。</div>
+    </section>
+
+    <section id="results" aria-live="polite"></section>
+
+    <div class="footer">Keiba PWA — ホーム画面に追加してお使いください</div>
+  </div>
+
+  <script src="/app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js').catch(()=>{});
+      });
+    }
+  </script>
+</body>
+</html>
